@@ -1,5 +1,3 @@
-include_directories(../include .)
-
 set(metakit_SOURCES column.cpp custom.cpp derived.cpp fileio.cpp field.cpp format.cpp handler.cpp persist.cpp remap.cpp store.cpp string.cpp table.cpp univ.cpp view.cpp viewx.cpp)
 
 # Enable to build with system STL
@@ -14,3 +12,6 @@ add_library(mk4_shared SHARED ${metakit_SOURCES})
 #find_package(Thread)
 #target_link_libraries(mk4 pthread)
 add_library(mk4_static STATIC ${metakit_SOURCES})
+
+target_include_directories(mk4_shared PUBLIC "../include/" "../configs/common/")
+target_include_directories(mk4_static PUBLIC "../include/" "../configs/common/")
