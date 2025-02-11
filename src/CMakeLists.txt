@@ -1,17 +1,55 @@
-set(metakit_SOURCES column.cpp custom.cpp derived.cpp fileio.cpp field.cpp format.cpp handler.cpp persist.cpp remap.cpp store.cpp string.cpp table.cpp univ.cpp view.cpp viewx.cpp)
+#==============================================================================================================
+# options
+#==============================================================================================================
+option(METAKIT_BUILD_STATIC_LIBRARY "Build metakit statically" OFF)
+option(METAKIT_USE_SYSTEM_STL "Enable to build with system STL" OFF)
 
+#==============================================================================================================
+# retrieve sources
+#==============================================================================================================
+set(metakit_SOURCES
+    column.cpp
+    custom.cpp
+    derived.cpp
+    fileio.cpp
+    field.cpp
+    format.cpp
+    handler.cpp
+    persist.cpp
+    remap.cpp
+    store.cpp
+    string.cpp
+    table.cpp
+    univ.cpp
+    view.cpp
+    viewx.cpp)
+
+#==============================================================================================================
 # Enable to build with system STL
-if (USE_SYSTEM_STL)
+#==============================================================================================================
+if (METAKIT_USE_SYSTEM_STL)
 	add_definitions(-Dq4_STD)
 	list(APPEND metakit_SOURCES std.cpp)
-endif (USE_SYSTEM_STL)
+endif()
 
-#g++ -dynamiclib -flat_namespace -undefined suppress -o libmk4.dylib column.o custom.o derived.o fileio.o field.o format.o handler.o persist.o remap.o std.o store.o string.o table.o univ.o view.o viewx.o -lpthread
+#==============================================================================================================
+# prepare to library bundle
+#==============================================================================================================
+if(METAKIT_BUILD_STATIC_LIBRARY)
+    add_library(metakit STATIC ${metakit_SOURCES})
+else()
+    add_library(metakit SHARED ${metakit_SOURCES})
+endif()
 
-add_library(mk4_shared SHARED ${metakit_SOURCES})
-#find_package(Thread)
-#target_link_libraries(mk4 pthread)
-add_library(mk4_static STATIC ${metakit_SOURCES})
+add_library(metakit::metakit ALIAS metakit)
 
-target_include_directories(mk4_shared PUBLIC "../include/" "../configs/common/")
-target_include_directories(mk4_static PUBLIC "../include/" "../configs/common/")
+target_include_directories(metakit PUBLIC "../include/" "../configs/common/")
+
+#==============================================================================================================
+# setup installation rules
+#==============================================================================================================
+include(GNUInstallDirs)
+install(TARGETS metakit
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
